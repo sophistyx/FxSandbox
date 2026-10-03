@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/FxSandbox.Api/FxSandbox.Api.csproj" />
+    <Project Path="src/FxSandbox.Core/FxSandbox.Core.csproj" />
+    <Project Path="src/FxSandbox.Simulation/FxSandbox.Simulation.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/FxSandbox.Api.Tests/FxSandbox.Api.Tests.csproj" />
+    <Project Path="tests/FxSandbox.Core.Tests/FxSandbox.Core.Tests.csproj" />
+    <Project Path="tests/FxSandbox.Simulation.Tests/FxSandbox.Simulation.Tests.csproj" />
+  </Folder>
+</Solution>
