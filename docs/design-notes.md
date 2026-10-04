@@ -15,3 +15,11 @@
 - **`ApplyFill(orderId)` fills at the order's limit price.** Matches the plan's fill-price simplification. Whether an order is fillable is the engine's job via `FillRule`.
 - **Equity for the capital check uses the last marked rates.** `Mark` stores them; before any mark, unrealised P&L is zero. Exposure = new qty + open position notional + pending notional, rejected only if it exceeds equity (equal is allowed).
 - **Netting.** Same direction: weighted-average entry. Opposite: realise P&L on the closed part at the fill price; a remainder in the old direction keeps its entry, a flip reopens at the fill price. P&L is `qty × (1 − entry / rate)` in USD.
+
+## Slice 3: Rate simulation
+
+- **`RateSimulator` is a plain, non-thread-safe class taking an injected `Random`.** A seeded `Random` makes paths deterministic in tests. Randomness is a real seam, so it is injected; the engine (slice 4) serialises access under its lock rather than the simulator locking itself.
+- **One shared `Random`, one draw per pair per step.** Pairs are independent random walks without a generator each. Trade-off: the pairs' paths depend on enumeration order for a given seed, which is stable for a fixed set of pairs.
+- **Δ is `(NextDouble() × 2 − 1) × 0.001`, i.e. [-0.001, +0.001).** `NextDouble` excludes 1, so the upper bound is approached but not reached, which is immaterial. The draw is converted to `decimal` before multiplying, so rates stay `decimal` throughout. Rates are not rounded, so the walk is exactly `old × (1 + Δ)`; display rounding is a UI concern.
+- **Multiplicative steps keep rates positive**, and every step is a bounded ±0.1% move. There is no mean reversion, so rates can drift far over long runs, which matches the spec's random walk.
+- **Config via `SimulationOptions` and an `appsettings.json` section; binding is deferred to slice 4.** Seed rates and tick interval are data, not code. The options class carries the 2 Oct close rates as defaults. Alternative: a dedicated options package or `IOptions` now, rejected until the hosted service needs it.
