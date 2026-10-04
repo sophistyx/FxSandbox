@@ -11,6 +11,13 @@ public class RateSimulatorTests
         [Pair.UsdChf] = 0.8288m,
     };
 
+    private const decimal HalfUnit = 0.000005m;
+
+    private sealed class FixedRandom(double value) : Random
+    {
+        public override double NextDouble() => value;
+    }
+
     private static decimal ValueOf(IReadOnlyList<Rate> rates, Pair pair) => rates.Single(r => r.Pair == pair).Value;
 
     [Fact]
@@ -33,11 +40,40 @@ public class RateSimulatorTests
             var next = sim.Step();
             foreach (var pair in Seeds.Keys)
             {
-                var ratio = ValueOf(next, pair) / previous[pair];
-                Assert.InRange(ratio, 1 - RateSimulator.MaxStep, 1 + RateSimulator.MaxStep);
-                previous[pair] = ValueOf(next, pair);
+                // Rounding to 5 dp can move a rate by up to half a unit in the last place beyond the raw step.
+                var value = ValueOf(next, pair);
+                Assert.InRange(
+                    value,
+                    previous[pair] * (1 - RateSimulator.MaxStep) - HalfUnit,
+                    previous[pair] * (1 + RateSimulator.MaxStep) + HalfUnit);
+                previous[pair] = value;
             }
         }
+    }
+
+    [Fact]
+    public void Every_rate_is_rounded_to_five_decimal_places()
+    {
+        var sim = new RateSimulator(Seeds, new Random(11));
+
+        for (var i = 0; i < 5_000; i++)
+        {
+            foreach (var rate in sim.Step())
+                Assert.Equal(Math.Round(rate.Value, 5), rate.Value);
+        }
+    }
+
+    [Fact]
+    public void Step_rounds_half_to_even()
+    {
+        // 0.5 gives a delta of 0, so the seed passes through the rounding unchanged apart from the rounding itself.
+        var up = new RateSimulator(
+            new Dictionary<Pair, decimal> { [Pair.UsdEur] = 0.123455m }, new FixedRandom(0.5));
+        var down = new RateSimulator(
+            new Dictionary<Pair, decimal> { [Pair.UsdEur] = 0.123465m }, new FixedRandom(0.5));
+
+        Assert.Equal(0.12346m, ValueOf(up.Step(), Pair.UsdEur)); // ...455 -> even digit 6 above
+        Assert.Equal(0.12346m, ValueOf(down.Step(), Pair.UsdEur)); // ...465 -> even digit 6 below
     }
 
     [Fact]

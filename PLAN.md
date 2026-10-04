@@ -60,6 +60,8 @@ Backend first (Core is pure and testable), then UI. Only add dependencies a slic
 - A rate equal to the limit fills.
 - Seed rates come from the 2 Oct 2026 close and live in `appsettings.json`: USD/EUR 0.8885, USD/GBP 0.7552, USD/CHF 0.8288. The README notes the source and date. We don't call a live FX feed.
 
+**Rate precision.** Rates are quoted to 5 decimal places. `RateSimulator` rounds each new rate with `Math.Round(value, 5, MidpointRounding.ToEven)`, so rates don't accumulate long decimal tails. The rounding can move a rate by up to half a unit in the 5th place beyond the raw ±0.1% step, which is negligible.
+
 **Fill price (simplification).** Orders always fill at their limit price, as in the prototype's toast. An order that is already marketable when placed is checked straight away, in the same operation, and also fills at its limit rather than the better market rate. This is a deliberate simplification and the README says so.
 
 **Capital.** *(Confirmed.)* Placing an order does not reserve cash, and fills do not debit cash.

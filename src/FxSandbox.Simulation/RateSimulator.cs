@@ -3,12 +3,16 @@ using FxSandbox.Core;
 namespace FxSandbox.Simulation;
 
 /// <summary>
-/// Per-pair random walk: <c>newRate = oldRate × (1 + Δ)</c> with Δ uniform in [-MaxStep, +MaxStep].
+/// Per-pair random walk: <c>newRate = oldRate × (1 + Δ)</c> with Δ uniform in [-MaxStep, +MaxStep],
+/// then rounded to <see cref="Decimals"/> places (banker's rounding).
 /// Not thread-safe; the owning engine serialises access.
 /// </summary>
 public sealed class RateSimulator
 {
     public const decimal MaxStep = 0.001m;
+
+    /// <summary>Rates are quoted to this many decimal places; each new rate is rounded to it.</summary>
+    public const int Decimals = 5;
 
     private readonly Random _random;
     private readonly Dictionary<Pair, decimal> _rates;
@@ -38,7 +42,7 @@ public sealed class RateSimulator
         foreach (var pair in _rates.Keys.ToArray())
         {
             var delta = (decimal)(_random.NextDouble() * 2 - 1) * MaxStep;
-            _rates[pair] *= 1 + delta;
+            _rates[pair] = Math.Round(_rates[pair] * (1 + delta), Decimals, MidpointRounding.ToEven);
         }
 
         return Current;

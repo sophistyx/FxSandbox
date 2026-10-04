@@ -26,7 +26,7 @@ public class SandboxEngineTests
     [Fact]
     public void Tick_fills_a_sell_order_once_the_rate_rises_to_its_limit()
     {
-        var engine = Engine(new FixedRandom(1.0)); // +0.1% per tick: 0.8885 -> 0.88938885
+        var engine = Engine(new FixedRandom(1.0)); // +0.1% per tick: 0.8885 -> 0.88939 (5 dp)
         var placed = engine.Place(Pair.UsdEur, Side.Sell, 1_000m, 0.889m).Order!;
 
         var snapshot = engine.Tick();
