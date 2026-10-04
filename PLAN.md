@@ -29,7 +29,7 @@ Backend first (Core is pure and testable), then UI. Only add dependencies a slic
    - Enable JSON enum strings, CORS for the Vite origin and OpenAPI.
    - Tests use `WebApplicationFactory` in `FxSandbox.Api.Tests`. Replace `UnitTest1.cs` with real tests, and drop the empty placeholder test files.
 6. [x] **SignalR hub.** `/hubs/sandbox` pushes `snapshot` after each tick and discrete `orderFilled` events. One minimal test: connect a test client and receive a tick.
-7. [ ] **UI foundation.**
+7. [x] **UI foundation.**
    - Add `@tanstack/react-query`, a Vite dev proxy to `localhost:5290`, a typed API client, and `QueryClientProvider`.
    - Add the shadcn `card`, `badge` and `table` components, checking the generated Base UI source first.
    - Build the header ("FX sandbox" plus Live badge) and the four summary cards, driven by `useQuery(['state'])`.
