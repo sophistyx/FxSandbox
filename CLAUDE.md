@@ -32,6 +32,7 @@ dotnet test
 dotnet test --filter "FullyQualifiedName~ClassName.MethodName"   # single test
 dotnet run --project src/FxSandbox.Api --launch-profile http
 ```
+When piping dotnet output (e.g. to grep/tail), add `--disable-build-servers`, e.g. `dotnet test --disable-build-servers 2>&1 | tail -20`. Without it, build-server processes keep the pipe open and the command hangs until timeout.
 
 UI (from `src/fx-sandbox-ui`):
 
