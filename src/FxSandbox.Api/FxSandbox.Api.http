@@ -1,30 +1,68 @@
-@FxSandbox.Api_HostAddress = http://localhost:5290
+@host = http://localhost:5290
 
-GET {{FxSandbox.Api_HostAddress}}/api/state
+### 0. Start clean
+POST {{host}}/api/reset
+
+### 1. State: cash/equity 10,000, rates near seeds. Send twice, rates should move.
+GET {{host}}/api/state
 Accept: application/json
 
-###
-
-# Marketable buy: fills immediately at its limit.
-POST {{FxSandbox.Api_HostAddress}}/api/orders
+### 2. Marketable buy (limit just ABOVE current USD/EUR). Expect 201, Filled, long 1,000 @ 0.89
+POST {{host}}/api/orders
 Content-Type: application/json
 
-{ "pair": "UsdEur", "side": "Buy", "quantity": 1000, "limitPrice": 0.95 }
+{ "pair": "UsdEur", "side": "Buy", "quantity": 1000, "limitPrice": 0.89 }
 
-###
-
-# Far-off sell: stays pending.
-POST {{FxSandbox.Api_HostAddress}}/api/orders
+### 3. Far-off sell, stays Pending (id 1002)
+POST {{host}}/api/orders
 Content-Type: application/json
 
 { "pair": "UsdGbp", "side": "Sell", "quantity": 500, "limitPrice": 0.90 }
 
-###
+### 4a. Cancel it. Expect success, status Cancelled
+DELETE {{host}}/api/orders/1002
 
-DELETE {{FxSandbox.Api_HostAddress}}/api/orders/1002
+### 4b. Cancel again. Expect 409
+DELETE {{host}}/api/orders/1002
 
-###
+### 4c. Unknown order. Expect 404
+DELETE {{host}}/api/orders/9999
 
-POST {{FxSandbox.Api_HostAddress}}/api/reset
+### 5. Flip to short (limit just BELOW current USD/EUR). Expect cash ~9,988.64, short 500 @ 0.88
+POST {{host}}/api/orders
+Content-Type: application/json
 
-###
+{ "pair": "UsdEur", "side": "Sell", "quantity": 1500, "limitPrice": 0.88 }
+
+### 6. Over the exposure limit. Expect 400
+POST {{host}}/api/orders
+Content-Type: application/json
+
+{ "pair": "UsdChf", "side": "Buy", "quantity": 20000, "limitPrice": 0.80 }
+
+### 7a. Validation: zero quantity. Expect 400
+POST {{host}}/api/orders
+Content-Type: application/json
+
+{ "pair": "UsdEur", "side": "Buy", "quantity": 0, "limitPrice": 0.88 }
+
+### 7b. Validation: negative limit. Expect 400
+POST {{host}}/api/orders
+Content-Type: application/json
+
+{ "pair": "UsdEur", "side": "Buy", "quantity": 1000, "limitPrice": -1 }
+
+### 7c. Validation: unknown pair. Expect 400
+POST {{host}}/api/orders
+Content-Type: application/json
+
+{ "pair": "UsdJpy", "side": "Buy", "quantity": 1000, "limitPrice": 0.88 }
+
+### 8. Fills on a later tick: set limit ~0.0005 BELOW current USD/GBP, then re-send step 1 until Filled
+POST {{host}}/api/orders
+Content-Type: application/json
+
+{ "pair": "UsdGbp", "side": "Buy", "quantity": 1000, "limitPrice": 0.7545 }
+
+### 9. Reset. Expect 10,000, nothing open, next id 1001
+POST {{host}}/api/reset
