@@ -21,9 +21,14 @@ builder.Services.ConfigureHttpJsonOptions(o =>
 builder.Services.AddCors(o => o.AddPolicy(UiCorsPolicy, p => p
     .WithOrigins("http://localhost:5173", "https://localhost:5173")
     .AllowAnyHeader()
-    .AllowAnyMethod()));
+    .AllowAnyMethod()
+    .AllowCredentials())); // SignalR negotiate sends credentials
+
+builder.Services.AddSignalR()
+    .AddJsonProtocol(o => o.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter(allowIntegerValues: false)));
 
 builder.Services.AddSandboxSimulation(builder.Configuration);
+builder.Services.AddHostedService<SandboxHubPublisher>();
 
 var app = builder.Build();
 
@@ -40,6 +45,7 @@ app.UseHttpsRedirection();
 app.UseCors(UiCorsPolicy);
 
 app.MapSandboxEndpoints();
+app.MapHub<SandboxHub>(SandboxHub.Route);
 
 app.Run();
 
