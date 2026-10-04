@@ -8,11 +8,23 @@ namespace FxSandbox.Api;
 /// Push-only hub at <see cref="Route"/>. Clients receive <see cref="SnapshotMethod"/> (a <see cref="StateDto"/>)
 /// after every tick and <see cref="OrderFilledMethod"/> (an <see cref="Order"/>) when an order fills.
 /// </summary>
-public sealed class SandboxHub : Hub
+public sealed class SandboxHub(ILogger<SandboxHub> logger) : Hub
 {
     public const string Route = "/hubs/sandbox";
     public const string SnapshotMethod = "snapshot";
     public const string OrderFilledMethod = "orderFilled";
+
+    public override Task OnConnectedAsync()
+    {
+        logger.LogInformation("Client connected: {ConnectionId}", Context.ConnectionId);
+        return base.OnConnectedAsync();
+    }
+
+    public override Task OnDisconnectedAsync(Exception? exception)
+    {
+        logger.LogInformation(exception, "Client disconnected: {ConnectionId}", Context.ConnectionId);
+        return base.OnDisconnectedAsync(exception);
+    }
 }
 
 /// <summary>Forwards <see cref="SandboxEngine"/> events to all connected hub clients.</summary>

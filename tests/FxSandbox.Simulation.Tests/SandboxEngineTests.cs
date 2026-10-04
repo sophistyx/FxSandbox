@@ -1,4 +1,5 @@
 using FxSandbox.Core;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 
 namespace FxSandbox.Simulation.Tests;
@@ -236,7 +237,7 @@ public class SandboxEngineTests
         var engine = Engine();
         var ticked = new TaskCompletionSource();
         engine.Ticked += _ => ticked.TrySetResult();
-        var service = new TickService(engine, Options.Create(new SimulationOptions { TickIntervalMs = 10 }));
+        var service = new TickService(engine, Options.Create(new SimulationOptions { TickIntervalMs = 10 }), NullLogger<TickService>.Instance);
 
         await service.StartAsync(CancellationToken.None);
         await ticked.Task.WaitAsync(TimeSpan.FromSeconds(5));
