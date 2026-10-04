@@ -9,6 +9,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": "http://localhost:5290",
+      "/hubs": { target: "http://localhost:5290", ws: true },
     },
   },
   resolve: {

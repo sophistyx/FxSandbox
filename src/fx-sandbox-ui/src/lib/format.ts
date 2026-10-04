@@ -19,5 +19,14 @@ const signedUsd = new Intl.NumberFormat("en-US", {
   signDisplay: "exceptZero",
 })
 
+const percent = new Intl.NumberFormat("en-US", {
+  style: "percent",
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+  signDisplay: "exceptZero",
+})
+
+export const formatRate = (value: number) => value.toFixed(5)
+export const formatPercent = (fraction: number) => percent.format(fraction)
 export const formatUsd = (value: number) => usd.format(value)
 export const formatSignedUsd = (value: number) => signedUsd.format(value)

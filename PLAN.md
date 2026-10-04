@@ -33,9 +33,9 @@ Backend first (Core is pure and testable), then UI. Only add dependencies a slic
    - Add `@tanstack/react-query`, a Vite dev proxy to `localhost:5290`, a typed API client, and `QueryClientProvider`.
    - Add the shadcn `card`, `badge` and `table` components, checking the generated Base UI source first.
    - Build the header ("FX sandbox" plus Live badge) and the four summary cards, driven by `useQuery(['state'])`.
-8. [ ] **Live updates and tickers.**
+8. [x] **Live updates and tickers.**
    - Add `@microsoft/signalr`. A connection hook calls `queryClient.setQueryData(['state'], snapshot)` and refetches on reconnect. The Live badge shows the connection state.
-   - Build the rate ticker cards with a tiny SVG sparkline, % change, and a green/red flash on each tick.
+   - Build the rate ticker cards with the rate, the % change and a tiny SVG sparkline, the sparkline and % coloured green or red by direction (no tick flash, to match the prototype).
 9. [ ] **Order form.**
    - Add `react-hook-form`, `zod` and `sonner`, plus the shadcn `select`, `toggle-group`, `input`, `button` and `form` components.
    - The form has a pair select, a buy/sell toggle, quantity (USD) and limit price.
