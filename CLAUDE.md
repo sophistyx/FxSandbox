@@ -58,3 +58,4 @@ The UI has no test runner configured.
 - Only add dependencies (NuGet or npm) that the current phase needs.
 - Write tests alongside the code, especially for order matching, fills, positions and P&L in Core.
 - Don't commit; I review and commit each phase myself.
+- Create and edit files with the Write/Edit tools, never shell heredocs.
