@@ -1,6 +1,30 @@
 @FxSandbox.Api_HostAddress = http://localhost:5290
 
-GET {{FxSandbox.Api_HostAddress}}/weatherforecast/
+GET {{FxSandbox.Api_HostAddress}}/api/state
 Accept: application/json
+
+###
+
+# Marketable buy: fills immediately at its limit.
+POST {{FxSandbox.Api_HostAddress}}/api/orders
+Content-Type: application/json
+
+{ "pair": "UsdEur", "side": "Buy", "quantity": 1000, "limitPrice": 0.95 }
+
+###
+
+# Far-off sell: stays pending.
+POST {{FxSandbox.Api_HostAddress}}/api/orders
+Content-Type: application/json
+
+{ "pair": "UsdGbp", "side": "Sell", "quantity": 500, "limitPrice": 0.90 }
+
+###
+
+DELETE {{FxSandbox.Api_HostAddress}}/api/orders/1002
+
+###
+
+POST {{FxSandbox.Api_HostAddress}}/api/reset
 
 ###

@@ -18,11 +18,14 @@ public sealed class SandboxEngine
     public const int DefaultHistoryLength = 60;
 
     private readonly object _gate = new();
-    private readonly Portfolio _portfolio;
-    private readonly RateSimulator _simulator;
+    private readonly Func<Portfolio>? _portfolioFactory;
+    private readonly Func<RateSimulator>? _simulatorFactory;
     private readonly int _historyLength;
     private readonly Dictionary<Pair, Queue<decimal>> _history = [];
+    private Portfolio _portfolio;
+    private RateSimulator _simulator;
 
+    /// <summary>Creates an engine that can't be <see cref="Reset"/>.</summary>
     public SandboxEngine(Portfolio portfolio, RateSimulator simulator, int historyLength = DefaultHistoryLength)
     {
         ArgumentNullException.ThrowIfNull(portfolio);
@@ -32,10 +35,21 @@ public sealed class SandboxEngine
         _portfolio = portfolio;
         _simulator = simulator;
         _historyLength = historyLength;
+        Start();
+    }
 
-        var rates = _simulator.Current;
-        Record(rates);
-        _portfolio.Mark(rates);
+    /// <summary>Creates an engine whose state can be rebuilt from the factories by <see cref="Reset"/>.</summary>
+    public SandboxEngine(
+        Func<Portfolio> portfolioFactory,
+        Func<RateSimulator> simulatorFactory,
+        int historyLength = DefaultHistoryLength)
+        : this(
+            (portfolioFactory ?? throw new ArgumentNullException(nameof(portfolioFactory)))(),
+            (simulatorFactory ?? throw new ArgumentNullException(nameof(simulatorFactory)))(),
+            historyLength)
+    {
+        _portfolioFactory = portfolioFactory;
+        _simulatorFactory = simulatorFactory;
     }
 
     /// <summary>Raised after every tick with the resulting state.</summary>
@@ -92,6 +106,27 @@ public sealed class SandboxEngine
         return result;
     }
 
+    /// <summary>Discards all orders, positions and rate history and starts again from the seed rates and capital.</summary>
+    /// <exception cref="InvalidOperationException">The engine was built without factories.</exception>
+    public SandboxSnapshot Reset()
+    {
+        if (_portfolioFactory is null || _simulatorFactory is null)
+            throw new InvalidOperationException("This engine was created without factories and can't be reset.");
+
+        SandboxSnapshot snapshot;
+        lock (_gate)
+        {
+            _portfolio = _portfolioFactory();
+            _simulator = _simulatorFactory();
+            _history.Clear();
+            Start();
+            snapshot = BuildSnapshot();
+        }
+
+        Ticked?.Invoke(snapshot);
+        return snapshot;
+    }
+
     /// <summary>Advances the rates, fills every pending order the new rates cross, and publishes the result.</summary>
     public SandboxSnapshot Tick()
     {
@@ -121,6 +156,13 @@ public sealed class SandboxEngine
     {
         var filled = _portfolio.ApplyFill(order.Id).Order;
         events.Add(() => OrderFilled?.Invoke(filled));
+    }
+
+    private void Start()
+    {
+        var rates = _simulator.Current;
+        Record(rates);
+        _portfolio.Mark(rates);
     }
 
     private void Record(IEnumerable<Rate> rates)

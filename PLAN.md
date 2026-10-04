@@ -23,7 +23,7 @@ Backend first (Core is pure and testable), then UI. Only add dependencies a slic
    - Tests: place, cancel, reject over-limit, add to position, partial close, full close, flip long to short, realised and unrealised P&L maths, equity.
 3. [x] **Rate simulation.** `RateSimulator` in `FxSandbox.Simulation`: `newRate = old × (1 + Δ)`, with `Δ` uniform in [-0.001, 0.001] from an injectable `Random`. Seed rates and the tick interval come from `appsettings.json`. Tests: the bound holds over many steps, a fixed seed is deterministic, and the pairs are independent.
 4. [x] **Sandbox service and concurrency.** `SandboxEngine` and the hosted tick service live in `FxSandbox.Simulation` (it references Core). The Api project only hosts endpoints and the hub. `SandboxEngine` wraps `Portfolio` and `RateSimulator`. A single lock guards the state. A tick advances the rates, matches pending orders and applies fills. A `PeriodicTimer` `BackgroundService` drives ticks. Events (`Ticked`, `OrderFilled`, `OrderPlaced`, `OrderCancelled`) are published after the lock is released. Tests: a tick fills crossed orders, plus one minimal parallel place/cancel/tick stress test asserting no double fill and consistent equity.
-5. [ ] **REST API.** Replace the weather sample.
+5. [x] **REST API.** Replace the weather sample.
    - Endpoints: `GET /api/state` (snapshot: cash, equity, unrealised P&L, rates plus recent history, positions, orders), `POST /api/orders`, `DELETE /api/orders/{id}`, `POST /api/reset`.
    - Validation errors return ProblemDetails 400, and cancelling a filled order returns 409.
    - Enable JSON enum strings, CORS for the Vite origin and OpenAPI.

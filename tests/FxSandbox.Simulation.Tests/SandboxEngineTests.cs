@@ -205,6 +205,32 @@ public class SandboxEngineTests
     }
 
     [Fact]
+    public void Reset_restores_seed_rates_capital_and_order_ids_and_publishes()
+    {
+        var engine = new SandboxEngine(() => new Portfolio(), () => new RateSimulator(Seeds, new FixedRandom(1.0)));
+        engine.Place(Pair.UsdEur, Side.Buy, 1_000m, 5m);
+        engine.Tick();
+        SandboxSnapshot? published = null;
+        engine.Ticked += s => published = s;
+
+        var snapshot = engine.Reset();
+
+        Assert.Same(snapshot, published);
+        Assert.Empty(snapshot.Portfolio.Orders);
+        Assert.Empty(snapshot.Portfolio.Positions);
+        Assert.Equal(10_000m, snapshot.Portfolio.Equity);
+        Assert.Equal(0.8885m, RateOf(snapshot, Pair.UsdEur));
+        Assert.Single(snapshot.History[Pair.UsdEur]);
+        Assert.Equal(1001, engine.Place(Pair.UsdEur, Side.Buy, 100m, 0.01m).Order!.Id);
+    }
+
+    [Fact]
+    public void Reset_throws_when_built_without_factories()
+    {
+        Assert.Throws<InvalidOperationException>(() => Engine().Reset());
+    }
+
+    [Fact]
     public async Task TickService_ticks_the_engine_until_stopped()
     {
         var engine = Engine();
