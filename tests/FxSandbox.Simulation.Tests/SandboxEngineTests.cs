@@ -64,7 +64,7 @@ public class SandboxEngineTests
     }
 
     [Fact]
-    public void Place_fills_a_marketable_order_immediately_at_its_limit()
+    public void Place_fills_a_marketable_order_immediately_at_the_market_rate()
     {
         var engine = Engine();
 
@@ -72,7 +72,54 @@ public class SandboxEngineTests
 
         var snapshot = engine.GetSnapshot();
         Assert.Equal(OrderStatus.Filled, snapshot.Portfolio.Orders.Single(o => o.Id == order.Id).Status);
-        Assert.Equal(0.9m, Assert.Single(snapshot.Portfolio.Positions).Position.EntryPrice);
+        Assert.Equal(0.8885m, Assert.Single(snapshot.Portfolio.Positions).Position.EntryPrice);
+    }
+
+    [Fact]
+    public void Place_buy_with_a_generous_limit_fills_at_market_with_no_unrealised_pnl()
+    {
+        var engine = Engine();
+
+        engine.Place(Pair.UsdEur, Side.Buy, 1_000m, 0.95m); // limit well above the 0.8885 market
+
+        var snapshot = engine.GetSnapshot();
+        var position = Assert.Single(snapshot.Portfolio.Positions);
+        Assert.Equal(0.8885m, position.Position.EntryPrice);
+        Assert.Equal(0m, position.UnrealisedPnl);
+        Assert.Equal(10_000m, snapshot.Portfolio.Equity);
+    }
+
+    [Fact]
+    public void Place_sell_with_a_generous_limit_fills_at_market()
+    {
+        var engine = Engine();
+
+        engine.Place(Pair.UsdEur, Side.Sell, 1_000m, 0.8m); // limit well below the 0.8885 market
+
+        var position = Assert.Single(engine.GetSnapshot().Portfolio.Positions);
+        Assert.Equal(0.8885m, position.Position.EntryPrice);
+        Assert.Equal(0m, position.UnrealisedPnl);
+    }
+
+    [Fact]
+    public void Place_at_exactly_the_market_rate_fills_at_that_rate()
+    {
+        var engine = Engine();
+
+        engine.Place(Pair.UsdEur, Side.Buy, 1_000m, 0.8885m);
+
+        Assert.Equal(0.8885m, Assert.Single(engine.GetSnapshot().Portfolio.Positions).Position.EntryPrice);
+    }
+
+    [Fact]
+    public void Tick_still_fills_a_resting_order_at_its_limit()
+    {
+        var engine = Engine(new FixedRandom(0.0)); // -0.1% per tick: 0.8885 -> 0.88761 (5 dp)
+        engine.Place(Pair.UsdEur, Side.Buy, 1_000m, 0.888m); // not marketable at 0.8885
+
+        var snapshot = engine.Tick();
+
+        Assert.Equal(0.888m, Assert.Single(snapshot.Portfolio.Positions).Position.EntryPrice);
     }
 
     [Fact]

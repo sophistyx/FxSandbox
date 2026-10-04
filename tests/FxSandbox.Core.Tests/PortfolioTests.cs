@@ -106,6 +106,18 @@ public class PortfolioTests
     }
 
     [Fact]
+    public void ApplyFill_with_an_explicit_price_nets_at_that_price_not_the_limit()
+    {
+        var p = new Portfolio();
+        p.Mark([new Rate(Pair.UsdEur, 0.8885m)]);
+
+        p.ApplyFill(PlaceOk(p, Side.Buy, 1000m, 0.95m), 0.8885m);
+
+        Assert.Equal(new Position(Pair.UsdEur, 1000m, 0.8885m), OnlyPosition(p));
+        Assert.Equal(0m, Assert.Single(p.Snapshot().Positions).UnrealisedPnl);
+    }
+
+    [Fact]
     public void ApplyFill_sell_opens_short_position()
     {
         var p = new Portfolio();

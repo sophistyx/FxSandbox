@@ -2,7 +2,7 @@ namespace FxSandbox.Core;
 
 /// <summary>
 /// Orders, net positions and cash for a single trader. Not thread-safe: callers serialise access.
-/// Orders fill at their limit price; placing does not reserve cash.
+/// Orders fill at their limit price unless the caller supplies a better one; placing does not reserve cash.
 /// </summary>
 public sealed class Portfolio
 {
@@ -44,9 +44,13 @@ public sealed class Portfolio
         return CancelResult.Cancelled;
     }
 
-    /// <summary>Fills a pending order at its limit price, netting it into the pair's position.</summary>
+    /// <summary>
+    /// Fills a pending order, netting it into the pair's position. <paramref name="price"/> defaults to the
+    /// order's limit; an order that was already marketable when placed passes the market rate, which is at
+    /// least as good as the limit.
+    /// </summary>
     /// <exception cref="InvalidOperationException">The order is unknown or not pending.</exception>
-    public FillResult ApplyFill(int orderId)
+    public FillResult ApplyFill(int orderId, decimal? price = null)
     {
         var index = _orders.FindIndex(o => o.Id == orderId);
         if (index < 0) throw new InvalidOperationException($"Order {orderId} not found.");
@@ -57,7 +61,7 @@ public sealed class Portfolio
         _orders[index] = filled;
 
         var delta = filled.Side == Side.Buy ? filled.Quantity : -filled.Quantity;
-        var realised = Net(filled.Pair, delta, filled.LimitPrice);
+        var realised = Net(filled.Pair, delta, price ?? filled.LimitPrice);
         _cash += realised;
         return new(filled, realised);
     }

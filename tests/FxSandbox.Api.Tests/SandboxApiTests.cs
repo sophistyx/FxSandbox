@@ -62,7 +62,7 @@ public sealed class SandboxApiTests : IClassFixture<SandboxApiTests.Factory>
     }
 
     [Fact]
-    public async Task Place_marketable_order_fills_at_limit_and_opens_position()
+    public async Task Place_marketable_order_fills_at_market_and_opens_position()
     {
         var response = await Place("UsdEur", "Buy", 1000m, High);
 
@@ -72,7 +72,7 @@ public sealed class SandboxApiTests : IClassFixture<SandboxApiTests.Factory>
         Assert.Equal("UsdEur", position.Pair);
         Assert.Equal("Long", position.Direction);
         Assert.Equal(1000m, position.Quantity);
-        Assert.Equal(High, position.EntryPrice);
+        Assert.Equal(0.8885m, position.EntryPrice); // the seed rate, not the limit
     }
 
     [Theory]

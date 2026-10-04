@@ -62,7 +62,9 @@ Backend first (Core is pure and testable), then UI. Only add dependencies a slic
 
 **Rate precision.** Rates are quoted to 5 decimal places. `RateSimulator` rounds each new rate with `Math.Round(value, 5, MidpointRounding.ToEven)`, so rates don't accumulate long decimal tails. The rounding can move a rate by up to half a unit in the 5th place beyond the raw ±0.1% step, which is negligible.
 
-**Fill price (simplification).** Orders always fill at their limit price, as in the prototype's toast. An order that is already marketable when placed is checked straight away, in the same operation, and also fills at its limit rather than the better market rate. This is a deliberate simplification and the README says so.
+**Fill price.** A limit is the worst acceptable price, so the fill price depends on when the order fills.
+- An order that is already marketable when placed is checked straight away, in the same operation, and fills at the current market rate. A buy with limit 0.95 when the rate is 0.8885 fills at 0.8885 and opens with no unrealised P&L.
+- An order that rests and fills on a later tick fills at its limit price, as in the prototype's toast. This is a deliberate simplification: the rate may have moved slightly past the limit within the tick, and we ignore that. The README says so.
 
 **Capital.** *(Confirmed.)* Placing an order does not reserve cash, and fills do not debit cash.
 - Cash starts at 10,000 and changes only through realised P&L.

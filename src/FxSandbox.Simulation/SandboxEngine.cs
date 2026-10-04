@@ -68,7 +68,7 @@ public sealed class SandboxEngine
         lock (_gate) return BuildSnapshot();
     }
 
-    /// <summary>Places an order; if it is already marketable it fills immediately, at its limit price.</summary>
+    /// <summary>Places an order; if it is already marketable it fills immediately, at the current market rate.</summary>
     public PlaceResult Place(Pair pair, Side side, decimal quantity, decimal limitPrice)
     {
         PlaceResult result;
@@ -80,7 +80,8 @@ public sealed class SandboxEngine
             {
                 events.Add(() => OrderPlaced?.Invoke(order));
                 var rate = _simulator.Current.Single(r => r.Pair == pair);
-                if (FillRule.CanFill(order, rate)) Fill(order, events);
+                // A limit is the worst acceptable price, so a marketable order gets the market rate.
+                if (FillRule.CanFill(order, rate)) Fill(order, events, rate.Value);
             }
         }
 
@@ -152,9 +153,9 @@ public sealed class SandboxEngine
         return snapshot;
     }
 
-    private void Fill(Order order, List<Action> events)
+    private void Fill(Order order, List<Action> events, decimal? price = null)
     {
-        var filled = _portfolio.ApplyFill(order.Id).Order;
+        var filled = _portfolio.ApplyFill(order.Id, price).Order;
         events.Add(() => OrderFilled?.Invoke(filled));
     }
 

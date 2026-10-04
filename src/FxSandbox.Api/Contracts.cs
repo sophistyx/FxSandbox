@@ -25,10 +25,13 @@ public sealed record StateDto(
     IReadOnlyList<PositionDto> Positions,
     IReadOnlyList<Order> Orders)
 {
+    /// <summary>The domain keeps full decimal precision; money is rounded to cents only here, at the API boundary.</summary>
+    public static decimal RoundMoney(decimal value) => Math.Round(value, 2, MidpointRounding.AwayFromZero);
+
     public static StateDto From(SandboxSnapshot s) => new(
-        s.Portfolio.Cash,
-        s.Portfolio.Equity,
-        s.Portfolio.UnrealisedPnl,
+        RoundMoney(s.Portfolio.Cash),
+        RoundMoney(s.Portfolio.Equity),
+        RoundMoney(s.Portfolio.UnrealisedPnl),
         s.Rates
             .Select(r => new RateDto(r.Pair, r.Value, s.History.GetValueOrDefault(r.Pair) ?? []))
             .ToArray(),
@@ -39,7 +42,7 @@ public sealed record StateDto(
                 p.Position.Quantity,
                 p.Position.EntryPrice,
                 p.Rate,
-                p.UnrealisedPnl))
+                RoundMoney(p.UnrealisedPnl)))
             .ToArray(),
         s.Portfolio.Orders);
 }
