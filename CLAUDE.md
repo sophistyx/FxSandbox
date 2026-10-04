@@ -50,3 +50,11 @@ The UI has no test runner configured.
 - `@` is aliased to `src/fx-sandbox-ui/src`.
 - shadcn/ui is configured with **Base UI, not Radix**. Check the generated component source in `src/components/ui` before using component APIs; Radix-style props (e.g. `asChild`) may not exist.
 - Planned data flow (from `docs/notes.md`): server state via TanStack Query (`useQuery`/`useMutation`), with live updates via SignalR pushing into the query cache. Neither is installed yet; add them in the first slice that calls the API.
+
+## Workflow
+
+- Work from `PLAN.md`: implement one phase at a time, then stop and summarise. Tick the phase's checkbox when done.
+- Before declaring a phase done: `dotnet build` and `dotnet test` pass; for UI changes, `npm run build`, `npm run lint` and `npm run format` pass.
+- Only add dependencies (NuGet or npm) that the current phase needs.
+- Write tests alongside the code, especially for order matching, fills, positions and P&L in Core.
+- Don't commit; I review and commit each phase myself.
