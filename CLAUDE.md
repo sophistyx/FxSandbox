@@ -51,6 +51,12 @@ The UI has no test runner configured.
 - shadcn/ui is configured with **Base UI, not Radix**. Check the generated component source in `src/components/ui` before using component APIs; Radix-style props (e.g. `asChild`) may not exist.
 - Planned data flow (from `docs/notes.md`): server state via TanStack Query (`useQuery`/`useMutation`), with live updates via SignalR pushing into the query cache. Neither is installed yet; add them in the first slice that calls the API.
 
+## Code conventions
+
+- Domain data as immutable records; small value types as `readonly record struct`.
+- Pure domain logic in static or plain classes (e.g. `FillRule.CanFill`), not interfaces + DI. Use interfaces only at real seams: I/O, time, randomness, publishing.
+- `decimal` for all money and rates.
+
 ## Workflow
 
 - Work from `PLAN.md`: implement one phase at a time, then stop and summarise. Tick the phase's checkbox when done.

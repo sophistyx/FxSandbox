@@ -14,7 +14,7 @@ Backend first (Core is pure and testable), then UI. Only add dependencies a slic
 
 0. [x] **Plan file.** Add `PLAN.md` (checkbox per slice) and remove the `Class1.cs` placeholders when the first real type lands.
 1. [x] **Core types and fill rule.** `Pair`, `Side`, `OrderStatus`, `Order`, `Position`, `Rate` in `FxSandbox.Core`, using `decimal`. A `FillRule.CanFill(order, rate)` function: Buy fills when `rate <= limit`, Sell when `rate >= limit`. Tests: boundaries (equal fills), both sides.
-2. [ ] **Core portfolio engine.** A synchronous, single-threaded `Portfolio` class with:
+2. [x] **Core portfolio engine.** A synchronous, single-threaded `Portfolio` class with:
    - `Place`: validates the quantity and limit price, then applies the capital check below.
    - `Cancel`: pending orders only.
    - `ApplyFill`: nets per pair, with a weighted-average entry. An opposite fill reduces, closes or flips the position and realises P&L into cash.
