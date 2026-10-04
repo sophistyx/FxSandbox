@@ -10,7 +10,7 @@ Rate simulation: per-pair random walk, `newRate = oldRate × (1 + Δ)` with `Δ 
 
 The full spec lives in `local/spec.md` (git-ignored, so it may be absent in a fresh clone). `reference/` holds the UI prototype and component-map images. `PLAN.md` tracks the slices and records the design decisions; `docs/` has working notes. `README.md` is still empty (written in the polish slice).
 
-Status: the backend is complete (domain, simulation, REST API, SignalR hub). The UI has the header with a live connection badge, summary cards and rate tickers; the order form, positions, order book and fill toasts are still to come (see `PLAN.md`).
+Status: the backend is complete (domain, simulation, REST API, SignalR hub). The UI has the header with a live connection badge, summary cards, rate tickers and the order form (react-hook-form + zod, with sonner toasts); the positions, order book and fill toasts are still to come (see `PLAN.md`).
 
 ## Layout
 
@@ -19,7 +19,7 @@ Status: the backend is complete (domain, simulation, REST API, SignalR hub). The
 - `src/FxSandbox.Api` – ASP.NET Core minimal API host. References Core and Simulation. `SandboxEndpoints.cs` maps `/api/state`, `/api/orders` (POST), `/api/orders/{id}` (DELETE) and `/api/reset`; `SandboxHub.cs` is the SignalR hub at `/hubs/sandbox` (pushes `snapshot` after each tick and `orderFilled` on fills) plus the publisher that forwards engine events to it; `Contracts.cs` holds the DTOs. `Program.cs` wires up string enums, ProblemDetails, CORS, OpenAPI and SignalR. Dev URLs are `http://localhost:5290` / `https://localhost:7249`.
 - `src/FxSandbox.Core` – pure domain: `Pair`, `Side`, `OrderStatus`, `Order`, `Position`, `Rate`, `FillRule`, and the single-threaded `Portfolio` (place, cancel, fills, netting, mark-to-market) with immutable `Snapshot`s.
 - `src/FxSandbox.Simulation` – `RateSimulator` (random walk, injectable `Random`), `SandboxEngine` (wraps `Portfolio` and the simulator under one lock, raises events after releasing it), `TickService` (`PeriodicTimer` background service), `SimulationOptions` (seed rates and tick interval from config) and `AddSandboxSimulation` for DI.
-- `src/fx-sandbox-ui` – React 19 + TypeScript + Vite 8 + Tailwind 4 + shadcn/ui. `lib/api.ts` is the typed REST client and shared types; `hooks/use-sandbox-state.ts` is the `['state']` query; `hooks/use-sandbox-live.ts` is the SignalR connection that pushes snapshots into the query cache and exposes connection status; `components/` has `header`, `summary-cards`, `rate-tickers` and `theme-provider`, with shadcn primitives in `components/ui`. The Vite dev server proxies `/api` and `/hubs` to the API.
+- `src/fx-sandbox-ui` – React 19 + TypeScript + Vite 8 + Tailwind 4 + shadcn/ui. `lib/api.ts` is the typed REST client and shared types; `hooks/use-sandbox-state.ts` is the `['state']` query; `hooks/use-sandbox-live.ts` is the SignalR connection that pushes snapshots into the query cache and exposes connection status; `components/` has `header`, `summary-cards`, `rate-tickers`, `order-form` and `theme-provider`, with shadcn primitives in `components/ui`. The Vite dev server proxies `/api` and `/hubs` to the API.
 - `tests/FxSandbox.{Api,Core,Simulation}.Tests` – xUnit, one test project per source project (Api.Tests references the Api project and uses `WebApplicationFactory`).
 
 ## Commands
