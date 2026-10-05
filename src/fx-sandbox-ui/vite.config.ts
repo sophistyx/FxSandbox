@@ -17,4 +17,9 @@ export default defineConfig({
       "@": resolve(import.meta.dirname, "./src"),
     },
   },
+  build: {
+    outDir: "../FxSandbox.Api/wwwroot",
+    emptyOutDir: true,
+  },
+  
 })

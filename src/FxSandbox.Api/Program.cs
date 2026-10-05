@@ -43,9 +43,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors(UiCorsPolicy);
+app.UseStaticFiles();
 
 app.MapSandboxEndpoints();
 app.MapHub<SandboxHub>(SandboxHub.Route);
+
+app.MapFallbackToFile("index.html");
 
 app.Run();
 
