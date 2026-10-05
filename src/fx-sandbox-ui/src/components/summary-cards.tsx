@@ -13,7 +13,7 @@ function Stat({
   className?: string
 }) {
   return (
-    <Card size="sm">
+    <Card size="sm" className="bg-transparent ring-0">
       <CardContent>
         <div className="text-xs text-muted-foreground">{label}</div>
         <div className={cn("font-mono text-xl font-medium", className)}>
@@ -40,9 +40,9 @@ export function SummaryCards() {
   const pending = data.orders.filter((o) => o.status === "Pending").length
   const pnlClass =
     data.unrealisedPnl > 0
-      ? "text-green-700 dark:text-green-400"
+      ? "text-positive"
       : data.unrealisedPnl < 0
-        ? "text-red-700 dark:text-red-400"
+        ? "text-negative"
         : undefined
 
   return (

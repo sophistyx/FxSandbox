@@ -2,8 +2,11 @@ import { useEffect, useState } from "react"
 import { HubConnectionBuilder } from "@microsoft/signalr"
 import { useQueryClient } from "@tanstack/react-query"
 
+import { toast } from "sonner"
+
 import { STATE_KEY } from "@/hooks/use-sandbox-state"
-import type { SandboxState } from "@/lib/api"
+import type { Order, SandboxState } from "@/lib/api"
+import { formatRate, pairLabel } from "@/lib/format"
 
 const RETRY_MS = 5000
 
@@ -26,6 +29,12 @@ export function useSandboxLive(): ConnectionStatus {
 
     connection.on("snapshot", (snapshot: SandboxState) => {
       queryClient.setQueryData(STATE_KEY, snapshot)
+    })
+    connection.on("orderFilled", (order: Order) => {
+      toast.success(
+        `Order ${order.id} filled at ${formatRate(order.limitPrice)}`,
+        { description: `${order.side} ${pairLabel(order.pair)}` }
+      )
     })
     connection.onreconnecting(() => setStatus("reconnecting"))
     connection.onreconnected(() => {
@@ -58,7 +67,10 @@ export function useSandboxLive(): ConnectionStatus {
       retry = setTimeout(start, RETRY_MS)
     })
 
-    start()
+    // Defer the first start by a tick. StrictMode mounts, unmounts and remounts synchronously, so
+    // the throwaway first effect is cleaned up before it opens a connection; stopping a connection
+    // mid-negotiation is what makes SignalR log "stopped during negotiation" as an error.
+    retry = setTimeout(start, 0)
 
     return () => {
       disposed = true

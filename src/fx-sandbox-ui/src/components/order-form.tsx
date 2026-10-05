@@ -153,7 +153,7 @@ export function OrderForm() {
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <FieldGroup>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-4">
               <Field>
                 <FieldLabel id="pair-label">Pair</FieldLabel>
                 <Controller
@@ -200,10 +200,16 @@ export function OrderForm() {
                         if (next) field.onChange(next)
                       }}
                     >
-                      <ToggleGroupItem value="Buy" className="flex-1">
+                      <ToggleGroupItem
+                        value="Buy"
+                        className="flex-1 aria-pressed:bg-positive-soft aria-pressed:text-positive"
+                      >
                         Buy
                       </ToggleGroupItem>
-                      <ToggleGroupItem value="Sell" className="flex-1">
+                      <ToggleGroupItem
+                        value="Sell"
+                        className="flex-1 aria-pressed:bg-negative-soft aria-pressed:text-negative"
+                      >
                         Sell
                       </ToggleGroupItem>
                     </ToggleGroup>
@@ -247,7 +253,7 @@ export function OrderForm() {
               </Field>
             </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-col gap-3">
               {helper && (
                 <FieldDescription className="font-mono">
                   {helper}
@@ -255,10 +261,12 @@ export function OrderForm() {
               )}
               <Button
                 type="submit"
-                className="ml-auto"
+                className="w-full"
                 disabled={placeOrder.isPending}
               >
-                {placeOrder.isPending ? "Placing…" : "Place order"}
+                {placeOrder.isPending
+                  ? "Placing…"
+                  : `Place ${side.toLowerCase()} order`}
               </Button>
             </div>
           </FieldGroup>

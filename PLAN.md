@@ -41,7 +41,7 @@ Backend first (Core is pure and testable), then UI. Only add dependencies a slic
    - The form has a pair select, a buy/sell toggle, quantity (USD) and limit price.
    - The helper line reads "Fills when rate falls to X or lower" (Buy) or "rises to X or higher" (Sell).
    - `useMutation` posts the order; server rejections show as a toast and field errors.
-10. [ ] **Positions, order book and fill toasts.**
+10. [x] **Positions, order book and fill toasts.**
     - Positions table: long/short badge, qty, entry, rate, P&L.
     - Order book with an All/Pending/Filled `Tabs` filter and a Cancel button inside an `AlertDialog` (add `tabs` and `alert-dialog`).
     - `orderFilled` events raise a sonner toast ("Order 1004 filled at 0.7420").

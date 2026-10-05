@@ -4,8 +4,8 @@ import type { Rate } from "@/lib/api"
 import { formatPercent, formatRate, pairLabel } from "@/lib/format"
 import { cn } from "@/lib/utils"
 
-const UP = "text-green-700 dark:text-green-400"
-const DOWN = "text-red-700 dark:text-red-400"
+const UP = "text-positive"
+const DOWN = "text-negative"
 
 function Sparkline({
   values,
