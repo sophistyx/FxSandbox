@@ -1,5 +1,6 @@
 import { CircleIcon, SlidersHorizontalIcon } from "lucide-react"
 
+import { ThemeToggle } from "@/components/theme-toggle"
 import { Badge } from "@/components/ui/badge"
 import type { ConnectionStatus } from "@/hooks/use-sandbox-live"
 
@@ -21,10 +22,13 @@ export function Header({ status }: { status: ConnectionStatus }) {
         <SlidersHorizontalIcon className="size-4" aria-hidden />
         <h1 className="text-base font-medium">FX sandbox</h1>
       </div>
-      <Badge variant={variant} role="status">
-        <CircleIcon className="fill-current" aria-hidden />
-        {label}
-      </Badge>
+      <div className="flex items-center gap-2">
+        <Badge variant={variant} role="status">
+          <CircleIcon className="fill-current" aria-hidden />
+          {label}
+        </Badge>
+        <ThemeToggle />
+      </div>
     </header>
   )
 }

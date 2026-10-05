@@ -47,7 +47,7 @@ Backend first (Core is pure and testable), then UI. Only add dependencies a slic
     - `orderFilled` events raise a sonner toast ("Order 1004 filled at 0.7420").
 11. [ ] **Creative extra (deferred).** A larger price chart for the selected pair (shadcn `chart`/Recharts) with a dashed horizontal line at each pending limit price. Deferred, not dropped: revisit after slice 13 if time allows.
 12. [x] **README.** Run instructions, tests, architecture, Decisions and assumptions, how Claude Code was used, limitations, and the tidy-up of `CLAUDE.md` and `docs/notes.md`.
-13. [ ] **Polish: dark mode, loading/empty/error states, accessibility pass, page title.** `theme-provider.tsx` already exists, so add a toggle and check the contrast of green/red and badges in both themes.
+13. [ ] **Polish: dark mode, loading/empty/error states, accessibility pass, page title.** `theme-provider.tsx` already exists, so add a toggle and check the contrast of green/red and badges in both themes. *(Dark mode done: toggle in the header, dark by default. Loading/empty/error states, the accessibility pass and the page title remain, so the box stays unticked.)*
 
 ## Decisions
 

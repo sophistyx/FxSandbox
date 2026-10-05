@@ -88,3 +88,10 @@
 - **One Mermaid flowchart covers the request, tick and push paths together.** Mermaid renders in the repository host and stays in version control as text. Alternative: separate sequence diagrams per flow, rejected as more to maintain for a system this small.
 - **The "How I used Claude Code" section is factual and drawn from the repository history.** It lists the process (plan mode, slices, conventions, `/git-commit`) and the issues manual testing found, rather than general claims about the tool.
 - **Plan split.** Slice 11 (chart) is deferred rather than dropped, and the old polish slice becomes 12 (README) and 13 (polish), so documentation is finished before the optional UI work.
+
+## Slice 13 (part): Polish, dark mode
+
+- **Dark is the default, and the stored choice wins.** `ThemeProvider` takes `defaultTheme="dark"`, and it reads `localStorage` first, so a user who picks light keeps it. The system preference is no longer followed unless "system" is stored. Alternative: follow the system, rejected because the product is a trading screen where dark is the expected look.
+- **`class="dark"` is set statically on `<html>` in `index.html`.** The page paints dark before React mounts, with no inline script. The provider then removes it if light is stored. Trade-off: a user who chose light sees a brief dark flash on load. An inline script reading `localStorage` would remove it but duplicates the provider's logic.
+- **The toggle shows the resolved theme through CSS, not state.** `ThemeToggle` renders both icons and switches them with `hidden dark:block` and `dark:hidden`. A click flips the current `.dark` class, so it still works when the stored theme is "system". Alternative: expose the resolved theme from the provider, rejected as an API change for one consumer.
+- **No colour changes were needed.** The semantic tokens (`positive`, `negative`, `warning` and their `-soft` tints) already had dark values, and no component used a raw colour. Contrast has been reviewed only by token design, not measured in the browser, which stays on the slice 13 checklist.
