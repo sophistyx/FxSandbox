@@ -8,9 +8,9 @@ FX "sandbox" coding test: traders place limit orders (buy/sell) on simulated USD
 
 Rate simulation: per-pair random walk, `newRate = oldRate × (1 + Δ)` with `Δ ∈ [-0.001, +0.001]`, seeded from the current exchange rate.
 
-The full spec lives in `local/spec.md` (git-ignored, so it may be absent in a fresh clone). `reference/` holds the UI prototype and component-map images. `PLAN.md` tracks the slices and records the design decisions; `docs/` has working notes. `README.md` is still empty (written in the polish slice).
+The full spec lives in `local/spec.md` (git-ignored, so it may be absent in a fresh clone). `reference/` holds the UI prototype and component-map images. `PLAN.md` tracks the slices and records the design decisions; `docs/` has working notes. `README.md` covers running, tests, architecture, decisions and limitations.
 
-Status: the backend is complete (domain, simulation, REST API, SignalR hub). The UI has the header with a live connection badge, summary cards, rate tickers, the order form (react-hook-form + zod, with sonner toasts), the positions table, the order book (filter tabs and confirmed cancel) and fill toasts; the optional chart and polish slices are still to come (see `PLAN.md`).
+Status: the backend is complete (domain, simulation, REST API, SignalR hub). The UI has the header with a live connection badge, summary cards, rate tickers, the order form (react-hook-form + zod, with sonner toasts), the positions table, the order book (filter tabs and confirmed cancel) and fill toasts, and the README is written. The polish slice (13) is still to come, and the optional chart (11) is deferred (see `PLAN.md`).
 
 ## Layout
 

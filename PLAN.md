@@ -8,7 +8,7 @@ Build the FX sandbox from `local/spec.md`: USD 10,000 starting capital, three si
 
 ## Slices
 
-If time is short, drop slice 11 first and keep the polish slice.
+Slice 11 is deferred. Slices 12 and 13 come first.
 
 Backend first (Core is pure and testable), then UI. Only add dependencies a slice needs.
 
@@ -45,8 +45,9 @@ Backend first (Core is pure and testable), then UI. Only add dependencies a slic
     - Positions table: long/short badge, qty, entry, rate, P&L.
     - Order book with an All/Pending/Filled `Tabs` filter and a Cancel button inside an `AlertDialog` (add `tabs` and `alert-dialog`).
     - `orderFilled` events raise a sonner toast ("Order 1004 filled at 0.7420").
-11. [ ] **Creative extra (optional; skip if time is short).** A larger price chart for the selected pair (shadcn `chart`/Recharts) with a dashed horizontal line at each pending limit price.
-12. [ ] **Polish.** Dark mode (`theme-provider.tsx` already exists, so add a toggle and check the contrast of green/red and badges in both themes), loading/empty/error states, accessibility pass, README (run instructions, architecture, Decisions, assumptions), and the tidy-up of `CLAUDE.md` and `docs/notes.md`.
+11. [ ] **Creative extra (deferred).** A larger price chart for the selected pair (shadcn `chart`/Recharts) with a dashed horizontal line at each pending limit price. Deferred, not dropped: revisit after slice 13 if time allows.
+12. [x] **README.** Run instructions, tests, architecture, Decisions and assumptions, how Claude Code was used, limitations, and the tidy-up of `CLAUDE.md` and `docs/notes.md`.
+13. [ ] **Polish: dark mode, loading/empty/error states, accessibility pass, page title.** `theme-provider.tsx` already exists, so add a toggle and check the contrast of green/red and badges in both themes.
 
 ## Decisions
 
